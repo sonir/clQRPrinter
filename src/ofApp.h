@@ -7,6 +7,7 @@
 
 #include "ofMain.h"
 #include "ofxOsc.h"
+#include <string.h>
 #include "ito36.h"
 
 class ofApp : public ofBaseApp{
@@ -29,6 +30,7 @@ class ofApp : public ofBaseApp{
         
         ofSerial	serial;
 
+        void writeSerial(char *created_id,  int id_len);
     
     
 		void setup();

@@ -24,16 +24,21 @@ void ofApp::setup(){
     //serial.setup("COM4", baud); // windows example
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
     //serial.setup("/dev/ttyUSB0", baud); //linux example
-    serial.setup("/dev/tty.usbmodem1451", baud);
+
+    //137 Ratina
+    //    serial.setup("/dev/tty.usbmodem1451", baud);
+    // 137 MBP15
+        serial.setup("/dev/tty.usbmodem621", baud);
+    
     
     nTimesRead = 0;
     nBytesRead = 0;
     readTime = 0;
     memset(bytesReadString, 0, 4);
     
-    unsigned char buf[4] = {'o', 'f', '!', 0x0A};
-    serial.writeBytes(&buf[0], 4);
-
+//    unsigned char buf[4] = {'o', 'f', '!', 0x0A};
+//    serial.writeBytes(&buf[0], 4);
+    
 }
 
 //--------------------------------------------------------------
@@ -41,41 +46,41 @@ void ofApp::update(){
 
     listenOsc();
     
-    //Serial
-    if (bSendSerialMessage){
-        
-        // (1) write the letter "a" to serial:
-        //serial.writeByte('a');
-//        unsigned char buf[4] = {'o', 'f', '!', 0x0A};
-//        serial.writeBytes(&buf[0], 4);
-        
-        // (2) read
-        // now we try to read 3 bytes
-        // since we might not get them all the time 3 - but sometimes 0, 6, or something else,
-        // we will try to read three bytes, as much as we can
-        // otherwise, we may have a "lag" if we don't read fast enough
-        // or just read three every time. now, we will be sure to
-        // read as much as we can in groups of three...
-        
-//        nTimesRead = 0;
-//        nBytesRead = 0;
-//        int nRead  = 0;  // a temp variable to keep count per read
+//    //Serial
+//    if (bSendSerialMessage){
 //        
-//        unsigned char bytesReturned[3];
+//        // (1) write the letter "a" to serial:
+//        //serial.writeByte('a');
+////        unsigned char buf[4] = {'o', 'f', '!', 0x0A};
+////        serial.writeBytes(&buf[0], 4);
 //        
-//        memset(bytesReadString, 0, 4);
-//        memset(bytesReturned, 0, 3);
+//        // (2) read
+//        // now we try to read 3 bytes
+//        // since we might not get them all the time 3 - but sometimes 0, 6, or something else,
+//        // we will try to read three bytes, as much as we can
+//        // otherwise, we may have a "lag" if we don't read fast enough
+//        // or just read three every time. now, we will be sure to
+//        // read as much as we can in groups of three...
 //        
-//        while( (nRead = serial.readBytes( bytesReturned, 3)) > 0){
-//            nTimesRead++;
-//            nBytesRead = nRead;
-//        };
-//        
-//        memcpy(bytesReadString, bytesReturned, 3);
-//        
-        bSendSerialMessage = false;
-        readTime = ofGetElapsedTimef();
-    }
+////        nTimesRead = 0;
+////        nBytesRead = 0;
+////        int nRead  = 0;  // a temp variable to keep count per read
+////        
+////        unsigned char bytesReturned[3];
+////        
+////        memset(bytesReadString, 0, 4);
+////        memset(bytesReturned, 0, 3);
+////        
+////        while( (nRead = serial.readBytes( bytesReturned, 3)) > 0){
+////            nTimesRead++;
+////            nBytesRead = nRead;
+////        };
+////        
+////        memcpy(bytesReadString, bytesReturned, 3);
+////        
+//        bSendSerialMessage = false;
+//        readTime = ofGetElapsedTimef();
+//    }
     
 }
 
@@ -152,6 +157,7 @@ void ofApp::listenOsc(){
             char str[16];
             int str_length = ito36( id_seed, str );
 //            printf("%s\n", str);
+            this->writeSerial(str, str_length);
             
         }
 
@@ -161,3 +167,32 @@ void ofApp::listenOsc(){
 }
 
 
+//--------------------------------------------------------------
+void ofApp::writeSerial(char *created_id, int id_len){
+
+    
+    char slash[]="/";
+    char lb[]="\n";
+    char basic_url[40] = "http://cell.sonilab.org/";
+    int url_len =24;
+    
+    strcat(basic_url, created_id);
+    strcat(basic_url, slash);
+    strcat(basic_url, lb);
+    int total_len = url_len + id_len + 2; // 2= slash and linebreak
+    
+    //Copy the creared url to buffer
+    unsigned char buf[40];
+    for (int i=0; i<40; i++){
+        
+        buf[i] = basic_url[i];
+        
+    }
+    cout << basic_url;
+    serial.writeBytes(&buf[0],total_len);
+    
+//    unsigned char buf[40] = basic_url;
+//    serial.writeBytes(&buf[0], 4);
+    
+    
+}
